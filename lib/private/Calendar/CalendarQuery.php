@@ -88,12 +88,24 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 		return $this->options;
 	}
 
+	public function setOptions(string $key, string $value): void {
+		$this->options[$key] = $value;
+	}
+
 	public function getLimit(): int {
 		return $this->limit;
 	}
 
+	public function setLimit(int $limit): void {
+		$this->limit = $limit;
+	}
+
 	public function getOffset() {
 		return $this->offset;
+	}
+
+	public function setOffset(int $offset): void {
+		$this->offset = $offset;
 	}
 
 	public function searchAttendee(): void {

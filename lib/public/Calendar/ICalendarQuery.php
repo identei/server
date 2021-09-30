@@ -30,17 +30,13 @@ namespace OCP\Calendar;
  */
 interface ICalendarQuery {
 
-	public function getSearchPattern(): string;
-
 	public function setSearchPattern(string $pattern): void;
-
-	public function getSearchProperties(): array;
 
 	public function setSearchProperty(string $value): void;
 
-	public function getOptions(): array;
+	public function setOptions(string $key, string $value): void;
 
-	public function getLimit(): int;
+	public function setLimit(int $limit): void;
 
-	public function getOffset();
+	public function setOffset(int $offset): void;
 }

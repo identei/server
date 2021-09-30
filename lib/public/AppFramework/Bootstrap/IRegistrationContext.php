@@ -233,8 +233,9 @@ interface IRegistrationContext {
 	/**
 	 * Register a calendar provider
 	 *
-	 * @param array $calendarUris
-	 * @since 22.0.0
+	 * @param string $class
+	 * @psalm-param class-string<IProvider> $class
+	 * @since 23.0.0
 	 */
 	public function registerCalendarProvider(string $class): void;
 }
