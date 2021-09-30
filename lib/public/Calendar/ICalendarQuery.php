@@ -1,9 +1,9 @@
 <?php
+
 /**
- * @copyright 2017, Georg Ehrke <oc.list@georgehrke.com>
+ * @copyright 2021 Anna Larch <anna.larch@gmx.net>
  *
- * @author Christoph Wurst <christoph@winzerhof-wurst.at>
- * @author Georg Ehrke <oc.list@georgehrke.com>
+ * @author Anna Larch <anna.larch@gmx.net>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,15 +24,15 @@
 namespace OCP\Calendar;
 
 /**
- * Interface ICalendar
+ * Interface ICalendarQuery
  *
- * @since 13.0.0
+ * @since 23.0.0
  */
 interface ICalendarQuery {
 
-	public function getPattern(): string;
+	public function getSearchPattern(): string;
 
-	public function setPattern(string $pattern): void;
+	public function setSearchPattern(string $pattern): void;
 
 	public function getSearchProperties(): array;
 

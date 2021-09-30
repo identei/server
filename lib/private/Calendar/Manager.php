@@ -150,12 +150,13 @@ class Manager implements \OCP\Calendar\IManager {
 	/**
 	 * @param ICalendarQuery $query
 	 */
-	public function searchForPrincipalUri(string $principalUri, ICalendarQuery $query) {
-		$calendars = $this->calendarProvider->getCalendars($principalUri);
-		$result = [];
-		foreach ($calendars as $calendar) {
+	public function searchForPrincipal(ICalendarQuery $query) {
+		/** @var CalendarQuery $query */
+		$calendars = $this->calendarProvider->getCalendars($query->getPrincipalUri(), $query->getCalendarUris());
+		$results = [];
+		foreach($calendars as $calendar) {
 			$r = $calendar->search(
-				$query->getPattern(),
+				$query->getSearchPattern(),
 				$query->getSearchProperties(),
 				$query->getOptions(),
 				$query->getLimit(),
@@ -163,14 +164,17 @@ class Manager implements \OCP\Calendar\IManager {
 			);
 			foreach ($r as $o) {
 				$o['calendar-key'] = $calendar->getKey();
-				$result[] = $o;
+				$results[] = $o;
 			}
 		}
-
-		return $result;
+		return $results;
 	}
 
-	private function newQuery(): ICalendarQuery {
+	/**
+	 * @return ICalendarQuery
+	 */
+	public function newQuery(string $principalUri = '', string $calendarUri = '', string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null): ICalendarQuery {
 		return new CalendarQuery();
 	}
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2021 Anna Larch <anna.larch@gmx.net>
  *
@@ -23,15 +24,15 @@
 namespace OCP\Calendar;
 
 /**
- * Interface ICalendar
+ * Interface ICalendarProvider
  *
- * @since 13.0.0
+ * @since 23.0.0
  */
 interface ICalendarProvider {
 
 	/**
-	 * @param array $principalUris
+	 * @param string $principalUri
 	 * @return ICalendar[]
 	 */
-	public function getCalendars(string $principalUri): array;
+	public function getCalendars(string $principalUri, array $calendarUris = []): array;
 }

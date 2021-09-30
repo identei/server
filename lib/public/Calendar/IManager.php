@@ -4,6 +4,7 @@
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Georg Ehrke <oc.list@georgehrke.com>
+ * @author Anna Larch <anna.larch@gmx.net>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -118,4 +119,10 @@ interface IManager {
 	 * @since 13.0.0
 	 */
 	public function clear();
+
+	/**
+	 * @return ICalendarQuery
+	 * @since 23.0.0
+	 */
+	public function newQuery(string $principalUri = '', string $calendarUri = '', string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null) : ICalendarQuery;
 }

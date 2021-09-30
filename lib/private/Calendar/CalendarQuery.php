@@ -29,30 +29,51 @@ use OCP\Calendar\ICalendarProvider;
 
 class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 
+	/** @var string */
+	private $principalUri;
+
 	/** @var array */
 	public $searchProperties;
 
 	/** @var string */
-	private $principalUri;
+	private $searchPattern;
 
-	/** @var string */
-	private $pattern;
-	private $offset;
+	/** @var array */
 	private $options;
+
+	/** @var int */
+	private $offset;
+
+	/** @var int */
 	private $limit;
 
-	public function __construct(string $principalUri = '', array $searchProperties = [], string $pattern = '') {
-		$this->searchProperties = $searchProperties;
+	/** @var array */
+	private $calendarUris;
+
+	public function __construct(string $principalUri = '', array $calendarUris = [], string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null) {
 		$this->principalUri = $principalUri;
-		$this->pattern = $pattern;
+		$this->calendarUris = $calendarUris;
+		$this->searchProperties = $searchProperties;
+		$this->options = $options;
+		$this->limit = $limit;
+		$this->offset = $offset;
+		$this->searchPattern = $searchPattern;
 	}
 
-	public function getPattern(): string {
-		return $this->pattern;
+	public function getPrincipalUri(): string {
+		return $this->principalUri;
 	}
 
-	public function setPattern(string $pattern): void {
-		$this->pattern = $pattern;
+	public function setPrincipalUri(string $principalUri): void {
+		$this->principalUri = $principalUri;
+	}
+
+	public function getSearchPattern(): string {
+		return $this->searchPattern;
+	}
+
+	public function setSearchPattern(string $pattern): void {
+		$this->searchPattern = $pattern;
 	}
 
 	public function getSearchProperties(): array {
@@ -81,14 +102,13 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 
 	public function searchOrganizer(): void {
 		$this->searchProperties[] = 'ORGANIZER';
-
 	}
 
 	public function searchSummary(): void {
 		$this->searchProperties[] = 'SUMMARY';
 	}
 
-	public function searchAppointment(): void {
+	public function searchAppointments(): void {
 		$this->searchProperties[] = 'X-NC-APPOINTMENT';
 	}
 
@@ -98,5 +118,13 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 
 	public function setTimerangeEnd(\DateTime $endTime): void {
 		$this->options['timerange']['end'] = $endTime;
+	}
+
+	public function setSearchCalendar(string $calendarUri) {
+		$this->calendarUris[] = $calendarUri;
+	}
+
+	public function getCalendarUris(): array {
+		return $this->calendarUris;
 	}
 }

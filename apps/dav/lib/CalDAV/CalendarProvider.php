@@ -38,7 +38,16 @@ class CalendarProvider implements ICalendarProvider {
 		$this->calDavBackend = $calDavBackend;
 	}
 
-	public function getCalendars(string $principalUri): array {
-		return $this->calDavBackend->getCalendarsForUser($principalUri);
+	public function getCalendars(string $principalUri, array $calendarUris = []): array {
+		if(empty($calendarUris)) {
+			return $this->calDavBackend->getCalendarsForUser($principalUri);
+		}
+
+		$calendars = [];
+		foreach ($calendarUris as $calendarUri) {
+			$calendars[] = $this->calDavBackend->getCalendarByUri($principalUri, $calendarUri);
+		}
+
+		return $calendars;
 	}
 }
