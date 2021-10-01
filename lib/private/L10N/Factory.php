@@ -42,6 +42,7 @@ use OCP\IUser;
 use OCP\IUserSession;
 use OCP\L10N\IFactory;
 use OCP\L10N\ILanguageIterator;
+use function is_null;
 
 /**
  * A factory that generates language instances
@@ -157,16 +158,17 @@ class Factory implements IFactory {
 	/**
 	 * Find the best language
 	 *
-	 * @param string|null $app App id or null for core
+	 * @param string|null $appId App id or null for core
+	 *
 	 * @return string language If nothing works it returns 'en'
 	 */
-	public function findLanguage($app = null) {
+	public function findLanguage(?string $appId = null): string {
 		$forceLang = $this->config->getSystemValue('force_language', false);
 		if (is_string($forceLang)) {
 			$this->requestLanguage = $forceLang;
 		}
 
-		if ($this->requestLanguage !== '' && $this->languageExists($app, $this->requestLanguage)) {
+		if ($this->requestLanguage !== '' && $this->languageExists($appId, $this->requestLanguage)) {
 			return $this->requestLanguage;
 		}
 
@@ -191,27 +193,66 @@ class Factory implements IFactory {
 
 		if ($userLang) {
 			$this->requestLanguage = $userLang;
-			if ($this->languageExists($app, $userLang)) {
+			if ($this->languageExists($appId, $userLang)) {
 				return $userLang;
 			}
 		}
 
 		try {
 			// Try to get the language from the Request
-			$lang = $this->getLanguageFromRequest($app);
-			if ($userId !== null && $app === null && !$userLang) {
+			$lang = $this->getLanguageFromRequest($appId);
+			if ($userId !== null && $appId === null && !$userLang) {
 				$this->config->setUserValue($userId, 'core', 'lang', $lang);
 			}
 			return $lang;
 		} catch (LanguageNotFoundException $e) {
 			// Finding language from request failed fall back to default language
 			$defaultLanguage = $this->config->getSystemValue('default_language', false);
-			if ($defaultLanguage !== false && $this->languageExists($app, $defaultLanguage)) {
+			if ($defaultLanguage !== false && $this->languageExists($appId, $defaultLanguage)) {
 				return $defaultLanguage;
 			}
 		}
 
-		// We could not find any language so fall back to english
+		// We could not find any language so fall back to English
+		return 'en';
+	}
+
+	public function findGenericLanguage(string $appId = null): string {
+		// Step 1: Forced language always has precedence over anything else
+		$forcedLanguage = $this->config->getSystemValue('force_language', false);
+		if ($forcedLanguage !== false) {
+			return $forcedLanguage;
+		}
+
+		// Step 2: Check if we have a default language
+		$defaultLanguage = $this->config->getSystemValue('default_language', false);
+		if ($defaultLanguage !== false && $this->languageExists($appId, $defaultLanguage)) {
+			return $defaultLanguage;
+		}
+
+		// Step 3.1: Check if Nextcloud is already installed before we try to access user info
+		if (!$this->config->getSystemValue('installed', false)) {
+			return 'en';
+		}
+		// Step 3.2: Check the current user (if any) for their preferred language
+		$user = $this->userSession->getUser();
+		if ($user === null) {
+			return 'en';
+		}
+		$userId = $user->getUID();
+		$userLang = $this->config->getUserValue($userId, 'core', 'lang', null);
+		if ($userLang !== null) {
+			return $userLang;
+		}
+
+		// Step 4: Check the request headers
+		try {
+			return $this->getLanguageFromRequest($appId);
+		} catch (LanguageNotFoundException $e) {
+			// Ignore and continue
+		}
+
+		// Step 5: fall back to English
 		return 'en';
 	}
 
@@ -406,11 +447,9 @@ class Factory implements IFactory {
 	}
 
 	/**
-	 * @param string|null $app
-	 * @return string
 	 * @throws LanguageNotFoundException
 	 */
-	private function getLanguageFromRequest($app) {
+	private function getLanguageFromRequest(?string $app = null): string {
 		$header = $this->request->getHeader('ACCEPT_LANGUAGE');
 		if ($header !== '') {
 			$available = $this->findAvailableLanguages($app);
