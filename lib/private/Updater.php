@@ -400,7 +400,7 @@ class Updater extends BasicEmitter {
 	 * @throws \Exception
 	 */
 	private function upgradeAppStoreApps(array $disabledApps, bool $reenable = false): void {
-		foreach ($disabledApps as $app) {
+		foreach ($disabledApps as $app => $previousEnableSetting) {
 			try {
 				$this->emit('\OC\Updater', 'checkAppStoreAppBefore', [$app]);
 				if ($this->installer->isUpdateAvailable($app)) {
@@ -411,7 +411,11 @@ class Updater extends BasicEmitter {
 
 				if ($reenable) {
 					$ocApp = new \OC_App();
-					$ocApp->enable($app);
+					if (!empty($previousEnableSetting)) {
+						$ocApp->enable($app, $previousEnableSetting);
+					} else {
+						$ocApp->enable($app);
+					}
 				}
 			} catch (\Exception $ex) {
 				$this->log->error($ex->getMessage(), [
