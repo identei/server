@@ -163,17 +163,19 @@ class Factory implements IFactory {
 	 * @return string language If nothing works it returns 'en'
 	 */
 	public function findLanguage(?string $appId = null): string {
+		// Step 1: Forced language always has precedence over anything else
 		$forceLang = $this->config->getSystemValue('force_language', false);
 		if (is_string($forceLang)) {
 			$this->requestLanguage = $forceLang;
 		}
 
+		// Step 2: Return cached language
 		if ($this->requestLanguage !== '' && $this->languageExists($appId, $this->requestLanguage)) {
 			return $this->requestLanguage;
 		}
 
 		/**
-		 * At this point Nextcloud might not yet be installed and thus the lookup
+		 * Step 3: At this point Nextcloud might not yet be installed and thus the lookup
 		 * in the preferences table might fail. For this reason we need to check
 		 * whether the instance has already been installed
 		 *
@@ -190,7 +192,6 @@ class Factory implements IFactory {
 			$userId = null;
 			$userLang = null;
 		}
-
 		if ($userLang) {
 			$this->requestLanguage = $userLang;
 			if ($this->languageExists($appId, $userLang)) {
@@ -198,6 +199,7 @@ class Factory implements IFactory {
 			}
 		}
 
+		// Step 4: Check the request headers
 		try {
 			// Try to get the language from the Request
 			$lang = $this->getLanguageFromRequest($appId);
@@ -213,7 +215,7 @@ class Factory implements IFactory {
 			}
 		}
 
-		// We could not find any language so fall back to English
+		// Step 5: fall back to English
 		return 'en';
 	}
 
@@ -236,13 +238,11 @@ class Factory implements IFactory {
 		}
 		// Step 3.2: Check the current user (if any) for their preferred language
 		$user = $this->userSession->getUser();
-		if ($user === null) {
-			return 'en';
-		}
-		$userId = $user->getUID();
-		$userLang = $this->config->getUserValue($userId, 'core', 'lang', null);
-		if ($userLang !== null) {
-			return $userLang;
+		if ($user !== null) {
+			$userLang = $this->config->getUserValue($user->getUID(), 'core', 'lang', null);
+			if ($userLang !== null) {
+				return $userLang;
+			}
 		}
 
 		// Step 4: Check the request headers
