@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  * @copyright 2016 Roeland Jago Douma <roeland@famdouma.nl>
@@ -393,7 +396,7 @@ class Factory implements IFactory {
 		}
 
 		$languages = $this->findAvailableLanguages($app);
-		return array_search($lang, $languages) !== false;
+		return in_array($lang, $languages);
 	}
 
 	public function getLanguageIterator(IUser $user = null): ILanguageIterator {
@@ -483,12 +486,8 @@ class Factory implements IFactory {
 	/**
 	 * if default language is set to de_DE (formal German) this should be
 	 * preferred to 'de' (non-formal German) if possible
-	 *
-	 * @param string|null $app
-	 * @param string $lang
-	 * @return string
 	 */
-	protected function respectDefaultLanguage($app, $lang) {
+	protected function respectDefaultLanguage(?string $app, ?string $lang): string {
 		$result = $lang;
 		$defaultLanguage = $this->config->getSystemValue('default_language', false);
 
