@@ -30,7 +30,6 @@ namespace OC\AppFramework\Bootstrap;
 
 use Closure;
 use OC\Support\CrashReport\Registry;
-use OCA\DAV\CalDAV\CalendarProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Middleware;

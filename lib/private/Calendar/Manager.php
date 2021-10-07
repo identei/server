@@ -26,6 +26,7 @@ namespace OC\Calendar;
 use OCP\Calendar\ICalendar;
 use OCP\Calendar\ICalendarProvider;
 use OCP\Calendar\ICalendarQuery;
+use Sabre\VObject\Recur\RRuleIterator;
 
 class Manager implements \OCP\Calendar\IManager {
 
@@ -173,8 +174,8 @@ class Manager implements \OCP\Calendar\IManager {
 	/**
 	 * @return ICalendarQuery
 	 */
-	public function newQuery(string $principalUri = '', string $calendarUri = '', string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null): ICalendarQuery {
-		return new CalendarQuery();
+	public function newQuery(string $principalUri): ICalendarQuery {
+		return new CalendarQuery($principalUri);
 	}
 
 }

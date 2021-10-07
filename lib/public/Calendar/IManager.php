@@ -124,5 +124,5 @@ interface IManager {
 	 * @return ICalendarQuery
 	 * @since 23.0.0
 	 */
-	public function newQuery(string $principalUri = '', string $calendarUri = '', string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null) : ICalendarQuery;
+	public function newQuery(string $principalUri) : ICalendarQuery;
 }

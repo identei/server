@@ -50,14 +50,10 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 	/** @var array */
 	private $calendarUris;
 
-	public function __construct(string $principalUri = '', array $calendarUris = [], string $searchPattern = '', array $searchProperties = [], array $options = [], ?int $limit = null, ?int $offset = null) {
+	public function __construct(string $principalUri) {
 		$this->principalUri = $principalUri;
-		$this->calendarUris = $calendarUris;
-		$this->searchProperties = $searchProperties;
-		$this->options = $options;
-		$this->limit = $limit;
-		$this->offset = $offset;
-		$this->searchPattern = $searchPattern;
+		$this->searchProperties = [];
+		$this->options = [];
 	}
 
 	public function getPrincipalUri(): string {
@@ -69,7 +65,7 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 	}
 
 	public function getSearchPattern(): string {
-		return $this->searchPattern;
+		return $this->searchPattern ?? '';
 	}
 
 	public function setSearchPattern(string $pattern): void {
@@ -92,16 +88,16 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 		$this->options[$key] = $value;
 	}
 
-	public function getLimit(): int {
-		return $this->limit;
+	public function getLimit(): ?int {
+		return $this->limit ?? null;
 	}
 
 	public function setLimit(int $limit): void {
 		$this->limit = $limit;
 	}
 
-	public function getOffset() {
-		return $this->offset;
+	public function getOffset(): ?int {
+		return $this->offset ?? null;
 	}
 
 	public function setOffset(int $offset): void {
@@ -132,7 +128,7 @@ class CalendarQuery implements \OCP\Calendar\ICalendarQuery {
 		$this->options['timerange']['end'] = $endTime;
 	}
 
-	public function setSearchCalendar(string $calendarUri) {
+	public function setSearchCalendar(string $calendarUri): void {
 		$this->calendarUris[] = $calendarUri;
 	}
 

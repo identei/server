@@ -25,6 +25,8 @@ namespace OCA\DAV\CalDAV;
 use OCP\Calendar\ICalendar;
 use OCP\Calendar\ICalendarProvider;
 use OCP\Constants;
+use OCP\IConfig;
+use OCP\IL10N;
 
 class CalendarProvider implements ICalendarProvider {
 
@@ -34,13 +36,17 @@ class CalendarProvider implements ICalendarProvider {
 	/**
 	 * @param CalDavBackend $calDavBackend
 	 */
-	public function __construct(CalDavBackend $calDavBackend) {
+	public function __construct(CalDavBackend $calDavBackend, IL10N $l10n, IConfig $config) {
 		$this->calDavBackend = $calDavBackend;
+		$this->l10n = $l10n;
+		$this->config = $config;
 	}
 
 	public function getCalendars(string $principalUri, array $calendarUris = []): array {
+		$calendars = [];
+		$iCalendars = [];
 		if(empty($calendarUris)) {
-			return $this->calDavBackend->getCalendarsForUser($principalUri);
+			$calendars[] = $this->calDavBackend->getCalendarsForUser($principalUri);
 		}
 
 		$calendars = [];
@@ -48,6 +54,14 @@ class CalendarProvider implements ICalendarProvider {
 			$calendars[] = $this->calDavBackend->getCalendarByUri($principalUri, $calendarUri);
 		}
 
-		return $calendars;
+		foreach ($calendars as $calendarInfo) {
+			$calendar = new Calendar($this->calDavBackend, $calendarInfo, $this->l10n, $this->config);
+			$iCalendars[] = new CalendarImpl(
+				$calendar,
+				$calendarInfo,
+				$this->calDavBackend
+			);
+		}
+		return $iCalendars;
 	}
 }
