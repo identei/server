@@ -172,4 +172,19 @@ class AppFetcher extends Fetcher {
 		$this->fileName = $fileName;
 		$this->ignoreMaxVersion = $ignoreMaxVersion;
 	}
+
+
+	public function get($allowUnstable = false) {
+		$apps = parent::get($allowUnstable);
+		$whitelist = $this->config->getSystemValue('appswhitelist', []);
+
+		// If the admin specified a whitelist, filter apps from the appstore
+		if (!empty($whitelist)) {
+			return array_filter($apps, function ($app) use ($whitelist) {
+				return in_array($app['id'], $whitelist);
+			});
+		}
+
+		return $apps;
+	}
 }

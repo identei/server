@@ -973,6 +973,11 @@ $CONFIG = [
 'appstoreurl' => 'https://apps.nextcloud.com/api/v1',
 
 /**
+ * Filters allowed installable apps from the appstore.
+ */
+'appswhitelist' => [],
+
+/**
  * Use the ``apps_paths`` parameter to set the location of the Apps directory,
  * which should be scanned for available apps, and where user-specific apps
  * should be installed from the Apps store. The ``path`` defines the absolute
